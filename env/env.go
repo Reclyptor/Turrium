@@ -1,6 +1,9 @@
 package env
 
-import "os"
+import (
+	"log"
+	"os"
+)
 
 var (
 	AWS_ACCESS_KEY_ID = os.Getenv("AWS_ACCESS_KEY_ID")
@@ -13,4 +16,45 @@ var (
 	MONGO_ALBUM_COLLECTION = os.Getenv("MONGO_ALBUM_COLLECTION")
 	MONGO_IMAGE_COLLECTION = os.Getenv("MONGO_IMAGE_COLLECTION")
 	MONGO_VIDEO_COLLECTION = os.Getenv("MONGO_VIDEO_COLLECTION")
+	OAUTH_CLIENT_ID = os.Getenv("OAUTH_CLIENT_ID")
+	OAUTH_CLIENT_SECRET = os.Getenv("OAUTH_CLIENT_SECRET")
 )
+
+func Verify() {
+	if AWS_ACCESS_KEY_ID == "" {
+		log.Fatal("Environment variable not found: AWS_ACCESS_KEY_ID")
+	}
+	if AWS_ACCESS_KEY_SECRET == "" {
+		log.Fatal("Environment variable not found: AWS_ACCESS_KEY_SECRET")
+	}
+	if AWS_REGION == "" {
+		log.Fatal("Environment variable not found: AWS_REGION")
+	}
+	if MONGO_HOST == "" {
+		log.Fatal("Environment variable not found: MONGO_HOST")
+	}
+	if MONGO_USERNAME == "" {
+		log.Fatal("Environment variable not found: MONGO_USERNAME")
+	}
+	if MONGO_PASSWORD == "" {
+		log.Fatal("Environment variable not found: MONGO_PASSWORD")
+	}
+	if MONGO_DATABASE == "" {
+		log.Fatal("Environment variable not found: MONGO_DATABASE")
+	}
+	if MONGO_ALBUM_COLLECTION == "" {
+		log.Fatal("Environment variable not found: MONGO_ALBUM_COLLECTION")
+	}
+	if MONGO_IMAGE_COLLECTION == "" {
+		log.Fatal("Environment variable not found: MONGO_IMAGE_COLLECTION")
+	}
+	if MONGO_VIDEO_COLLECTION == "" {
+		log.Fatal("Environment variable not found: MONGO_VIDEO_COLLECTION")
+	}
+	if OAUTH_CLIENT_ID == "" {
+		log.Fatal("Environment variable not found: OAUTH_CLIENT_ID")
+	}
+	if OAUTH_CLIENT_SECRET == "" {
+		log.Fatal("Environment variable not found: OAUTH_CLIENT_SECRET")
+	}
+}
