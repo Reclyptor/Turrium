@@ -1,3 +1,9 @@
+# Build Directory
+build
+
+# IDEA Directory
+.idea
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
