@@ -13,8 +13,8 @@ func main() {
 	router := gin.Default()
 
 	router.Use(
-		static.Serve("/", static.LocalFile("./react", true)),
-		static.Serve("/signin", static.LocalFile("./react", true)),
+		static.Serve("/", static.LocalFile("./ui", true)),
+		static.Serve("/signin", static.LocalFile("./ui", true)),
 	)
 
 	router.Use(cors.New(cors.Config{
