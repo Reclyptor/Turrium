@@ -16,8 +16,10 @@ var (
 	MONGO_ALBUM_COLLECTION = os.Getenv("MONGO_ALBUM_COLLECTION")
 	MONGO_IMAGE_COLLECTION = os.Getenv("MONGO_IMAGE_COLLECTION")
 	MONGO_VIDEO_COLLECTION = os.Getenv("MONGO_VIDEO_COLLECTION")
+	MONGO_USER_COLLECTION = os.Getenv("MONGO_USER_COLLECTION")
 	OAUTH_CLIENT_ID = os.Getenv("OAUTH_CLIENT_ID")
 	OAUTH_CLIENT_SECRET = os.Getenv("OAUTH_CLIENT_SECRET")
+	OAUTH_CLIENT_ISSUER = os.Getenv("OAUTH_CLIENT_ISSUER")
 )
 
 func Verify() {
@@ -51,10 +53,16 @@ func Verify() {
 	if MONGO_VIDEO_COLLECTION == "" {
 		log.Fatal("Environment variable not found: MONGO_VIDEO_COLLECTION")
 	}
+	if MONGO_USER_COLLECTION == "" {
+		log.Fatal("Environment variable not found: MONGO_USER_COLLECTION")
+	}
 	if OAUTH_CLIENT_ID == "" {
 		log.Fatal("Environment variable not found: OAUTH_CLIENT_ID")
 	}
 	if OAUTH_CLIENT_SECRET == "" {
 		log.Fatal("Environment variable not found: OAUTH_CLIENT_SECRET")
+	}
+	if OAUTH_CLIENT_ISSUER == "" {
+		log.Fatal("Environment variable not found: OAUTH_CLIENT_ISSUER")
 	}
 }

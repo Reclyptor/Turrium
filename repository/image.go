@@ -11,10 +11,6 @@ import (
 )
 
 func GetImages(filter bson.M, duration time.Duration) []*model.Image {
-	if env.MONGO_DATABASE == "" || env.MONGO_IMAGE_COLLECTION == "" {
-		return make([]*model.Image, 0)
-	}
-
 	client := mongo.Client()
 	if client == nil {
 		return make([]*model.Image, 0)

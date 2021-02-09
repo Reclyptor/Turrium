@@ -13,6 +13,8 @@ func main() {
 	router := gin.Default()
 	router.Use(middleware.EnableCors())
 	router.Use(middleware.ServeReact())
+	router.Use(middleware.VerifyTokens())
+	router.Use(middleware.VerifyUser())
 	api := router.Group("/api")
 	v1 := api.Group("/v1")
 	v1.GET("/albums", controller.GetAlbums)

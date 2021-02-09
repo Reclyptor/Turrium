@@ -11,10 +11,6 @@ import (
 )
 
 func GetAlbums(filter bson.M, duration time.Duration) []*model.Album {
-	if env.MONGO_DATABASE == "" || env.MONGO_ALBUM_COLLECTION == "" {
-		return make([]*model.Album, 0)
-	}
-
 	client := mongo.Client()
 	if client == nil {
 		return make([]*model.Album, 0)

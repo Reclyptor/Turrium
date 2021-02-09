@@ -11,10 +11,6 @@ import (
 )
 
 func GetVideos(filter bson.M, duration time.Duration) []*model.Video {
-	if env.MONGO_DATABASE == "" || env.MONGO_VIDEO_COLLECTION == "" {
-		return make([]*model.Video, 0)
-	}
-
 	client := mongo.Client()
 	if client == nil {
 		return make([]*model.Video, 0)

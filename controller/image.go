@@ -8,5 +8,5 @@ import (
 )
 
 func GetImages(c *gin.Context) {
-	c.JSON(200, repository.GetImages(bson.M{}, 15 * time.Minute)[:100])
+	c.JSON(200, repository.GetImages(bson.M{}, 15 * time.Minute))
 }
