@@ -8,7 +8,7 @@ import (
 
 func EnableCors() gin.HandlerFunc {
 	return cors.New(cors.Config{
-		AllowOrigins:  []string{"https://turrium.com", "http://localhost:3000"},
+		AllowOrigins:  []string{"https://turrium.com", "https://www.turrium.com", "http://localhost:3000"},
 		AllowMethods:  []string{"GET", "PUT", "POST", "DELETE", "OPTIONS"},
 		AllowHeaders:  []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
 		ExposeHeaders: []string{"Content-Length"},

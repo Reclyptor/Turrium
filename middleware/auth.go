@@ -93,8 +93,9 @@ func extractPrincipal(claims jwt.MapClaims) model.Principal {
 func VerifyTokens() gin.HandlerFunc {
 	keys := parseKeys("../certs/google.json")
 	return func(c *gin.Context) {
-		authorization := parseAuthorization(c.GetHeader("Authorization"))
-		claims := jwt.MapClaims{}
+		header := c.GetHeader("Authorization")
+		authorization := parseAuthorization(header)
+		var claims jwt.MapClaims = map[string]interface{}{}
 		_, err := jwt.ParseWithClaims(authorization, claims, func(token *jwt.Token) (interface{}, error) {
 			if kid, ok := token.Header["kid"]; ok {
 				return keys[kid.(string)], nil
