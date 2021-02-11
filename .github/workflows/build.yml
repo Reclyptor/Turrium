@@ -23,12 +23,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build & Push
+        name: DockerHub - Build & Push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: reclyptor/turrium:latest
+          tags: |
+            reclyptor/turrium:latest
+            reclyptor/turrium:${{ github.sha }}
+      -
+        name: Azure - Deploy
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: turrium
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: reclyptor/turrium:${{ github.sha }}
       -
         name: Image Digest
         run: echo ${{ steps.docker_build.outputs.digest }}
