@@ -1,4 +1,4 @@
-name: Go
+name: CI
 
 on:
   push:
@@ -10,20 +10,15 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
+      - uses: actions/checkout@v2
+
+      - name: DockerHub Login
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: DockerHub - Build & Push
+
+      - name: DockerHub - Build & Push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
@@ -31,13 +26,14 @@ jobs:
           tags: |
             reclyptor/turrium:latest
             reclyptor/turrium:${{ github.sha }}
-      -
-        name: Azure - Deploy
+
+      - name: Azure - Deploy
         uses: azure/webapps-deploy@v2
         with:
           app-name: turrium
+          slot-name: production
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: reclyptor/turrium:${{ github.sha }}
-      -
-        name: Image Digest
+
+      - name: Image Digest
         run: echo ${{ steps.docker_build.outputs.digest }}

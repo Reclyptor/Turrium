@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"crypto/rsa"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -11,6 +12,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 	"turrium/env"
 	"turrium/model"
 	"turrium/repository"
@@ -89,7 +91,7 @@ func extractPrincipal(claims jwt.MapClaims) model.Principal {
 }
 
 func VerifyTokens() gin.HandlerFunc {
-	keys := parseKeys("../certs/google.json")
+	keys := parseKeys("publickeys.json")
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
 		authorization := parseAuthorization(header)
@@ -98,13 +100,13 @@ func VerifyTokens() gin.HandlerFunc {
 			if kid, ok := token.Header["kid"]; ok {
 				return keys[kid.(string)], nil
 			}
-			return nil, errors.New("no matching key found")
+			return nil, errors.New("token could not be verified")
 		})
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, structs.Status{
 				Code: http.StatusUnauthorized,
 				Status: "UNAUTHORIZED",
-				Reason: "No matching key found.",
+				Reason: "Unauthorized.",
 			})
 			return
 		}
@@ -151,9 +153,12 @@ func VerifyUser() gin.HandlerFunc {
 			})
 			return
 		}
-		fmt.Println("===== PRINCIPAL =====")
-		fmt.Println(principal)
-		fmt.Println("=====================")
+
+		fmt.Println("======== PRINCIPAL ========")
+		fmt.Println("Timestamp: " + time.Now().Format(time.RFC3339))
+		JSON, _ := json.Marshal(principal)
+		fmt.Println("Principal: " + string(JSON))
+		fmt.Println("===========================")
 
 		allowedUsers := repository.GetUserEmails(bson.M{})
 		if _, allowed := allowedUsers[principal.Email]; !allowed {

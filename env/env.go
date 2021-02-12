@@ -20,6 +20,7 @@ var (
 	OAUTH_CLIENT_ID = os.Getenv("OAUTH_CLIENT_ID")
 	OAUTH_CLIENT_SECRET = os.Getenv("OAUTH_CLIENT_SECRET")
 	OAUTH_CLIENT_ISSUER = os.Getenv("OAUTH_CLIENT_ISSUER")
+	TURRIUM_UI_URL = os.Getenv("TURRIUM_UI_URL")
 )
 
 func Verify() {
@@ -64,5 +65,8 @@ func Verify() {
 	}
 	if OAUTH_CLIENT_ISSUER == "" {
 		log.Fatal("Environment variable not found: OAUTH_CLIENT_ISSUER")
+	}
+	if TURRIUM_UI_URL == "" {
+		log.Fatal("Environment variable not found: TURRIUM_UI_URL")
 	}
 }
