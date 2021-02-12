@@ -3,6 +3,7 @@ package middleware
 import (
 	"crypto/rsa"
 	"errors"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/lestrrat/go-jwx/jwk"
@@ -13,6 +14,7 @@ import (
 	"turrium/env"
 	"turrium/model"
 	"turrium/repository"
+	"turrium/structs"
 )
 
 func parseKeys(path string) map[string]*rsa.PublicKey {
@@ -40,10 +42,6 @@ func parseAuthorization(header string) string {
 	auth := strings.Split(header, " ")
 	token := auth[len(auth)-1]
 	return token
-}
-
-func verifyClaims(claims jwt.MapClaims) bool {
-	return claims.VerifyAudience(env.OAUTH_CLIENT_ID, true) && claims.VerifyIssuer(env.OAUTH_CLIENT_ISSUER, true)
 }
 
 func extractStringClaim(claims jwt.MapClaims, id string) string {
@@ -102,10 +100,31 @@ func VerifyTokens() gin.HandlerFunc {
 			}
 			return nil, errors.New("no matching key found")
 		})
-		if err != nil || !verifyClaims(claims) {
-			c.AbortWithStatus(http.StatusUnauthorized)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, structs.Status{
+				Code: http.StatusUnauthorized,
+				Status: "UNAUTHORIZED",
+				Reason: "No matching key found.",
+			})
 			return
 		}
+
+		if !claims.VerifyAudience(env.OAUTH_CLIENT_ID, true) {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, structs.Status{
+				Code: http.StatusUnauthorized,
+				Status: "UNAUTHORIZED",
+				Reason: "Invalid claim: aud.",
+			})
+			return
+		}
+		if !claims.VerifyIssuer(env.OAUTH_CLIENT_ISSUER, true) {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, structs.Status{
+				Code: http.StatusUnauthorized,
+				Status: "UNAUTHORIZED",
+				Reason: "Invalid claim: iss.",
+			})
+		}
+
 		c.Set("principal", extractPrincipal(claims))
 		c.Next()
 	}
@@ -115,19 +134,34 @@ func VerifyUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		value, exists := c.Get("principal")
 		if !exists {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, structs.Status{
+				Code:   http.StatusUnauthorized,
+				Status: "UNAUTHORIZED",
+				Reason: "Nonexistent principal.",
+			})
 			return
 		}
 
 		principal, ok := value.(model.Principal)
 		if !ok {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, structs.Status{
+				Code:   http.StatusUnauthorized,
+				Status: "UNAUTHORIZED",
+				Reason: "Invalid principal.",
+			})
 			return
 		}
+		fmt.Println("===== PRINCIPAL =====")
+		fmt.Println(principal)
+		fmt.Println("=====================")
 
 		allowedUsers := repository.GetUserEmails(bson.M{})
 		if _, allowed := allowedUsers[principal.Email]; !allowed {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, structs.Status{
+				Code:   http.StatusUnauthorized,
+				Status: "UNAUTHORIZED",
+				Reason: "Unauthorized user.",
+			})
 			return
 		}
 
