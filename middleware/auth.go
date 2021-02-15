@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lestrrat/go-jwx/jwk"
 	"go.mongodb.org/mongo-driver/bson"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -19,13 +18,8 @@ import (
 	"turrium/structs"
 )
 
-func parseKeys(path string) map[string]*rsa.PublicKey {
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		return make(map[string]*rsa.PublicKey)
-	}
-
-	set, err := jwk.Parse(data)
+func parseKeys() map[string]*rsa.PublicKey {
+	set, err := jwk.FetchHTTP(env.JWK_URL)
 	if err != nil {
 		return make(map[string]*rsa.PublicKey)
 	}
@@ -91,14 +85,16 @@ func extractPrincipal(claims jwt.MapClaims) model.Principal {
 }
 
 func VerifyTokens() gin.HandlerFunc {
-	keys := parseKeys("publickeys.json")
+	keys := parseKeys()
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
 		authorization := parseAuthorization(header)
 		var claims jwt.MapClaims = map[string]interface{}{}
 		_, err := jwt.ParseWithClaims(authorization, claims, func(token *jwt.Token) (interface{}, error) {
 			if kid, ok := token.Header["kid"]; ok {
-				return keys[kid.(string)], nil
+				if key, exists := keys[kid.(string)]; exists {
+					return key, nil
+				}
 			}
 			return nil, errors.New("token could not be verified")
 		})
