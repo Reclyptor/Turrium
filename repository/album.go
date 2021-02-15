@@ -3,14 +3,16 @@ package repository
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 	"turrium/env"
 	"turrium/model"
 	"turrium/mongo"
 	"turrium/storage"
+	"turrium/structs"
 )
 
-func GetAlbums(filter bson.M, duration time.Duration) []*model.Album {
+func GetAlbums(filter bson.M, pagination structs.Pagination, duration time.Duration) []*model.Album {
 	client := mongo.Client()
 	if client == nil {
 		return make([]*model.Album, 0)
@@ -25,7 +27,13 @@ func GetAlbums(filter bson.M, duration time.Duration) []*model.Album {
 	}
 	defer client.Disconnect(ctx)
 
-	cursor, err := client.Database(env.MONGO_DATABASE).Collection(env.MONGO_ALBUM_COLLECTION).Find(ctx, filter)
+	size := pagination.GetSize()
+	skip := pagination.GetSkip()
+	cursor, err := client.Database(env.MONGO_DATABASE).Collection(env.MONGO_ALBUM_COLLECTION).Find(ctx, filter, &options.FindOptions{
+		Limit: &size,
+		Skip:  &skip,
+		Sort:  bson.M{"_id": 1},
+	})
 	if err != nil {
 		return make([]*model.Album, 0)
 	}
